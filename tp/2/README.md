@@ -366,3 +366,7 @@ you've expected, you should send them an email. In general, mail sent to the nam
 website's domain should reach the appropriate person.
 The most common email address to send to is: "webmaster@example.com"
 ```
+
+## II. Une stack web plus avancée
+
+### 2. Setup
