@@ -6,7 +6,8 @@
 
 | Machine         | IP            | Service                 | Port ouvert | IP autorisées |
 |-----------------|---------------|-------------------------|-------------|---------------|
-| `web.tp2.linux` | `10.102.1.11` | Serveur Web             | `80`           | ?             |
+| `web.tp2.linux` | `10.102.1.11` | Serveur Web             | `80`          | `10.102.1.12`             |
+| `db.tp2.linux`  | `10.102.1.12` | Serveur Base de Données | `3306`           | `10.102.1.11`             |
 
 **🌞 Installer le serveur Apache**
 
@@ -198,7 +199,7 @@ Group apache
  
 * Utilisez la commande ps -ef pour visualiser les processus en cours d'exécution et confirmer que apache tourne bien sous l'utilisateur mentionné dans le fichier de conf
 
-`[paul@web httpd]$ [paul@web httpd]$ sudo ps -ef`
+`[paul@web httpd]$ sudo ps -ef`
 
 ```
 apache      2011    2010  0 15:52 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
@@ -223,7 +224,7 @@ drwxr-xr-x.  2 root root    6 Jun 11 17:35 html
 
 * Créez le nouvel utilisateur
  
- `[paul@web www]$ sudo useradd toto`
+ `[paul@web ~]$ sudo useradd toto`
  
 * Pour les options de création, inspirez-vous de l'utilisateur Apache existant
  
@@ -234,7 +235,7 @@ drwxr-xr-x.  2 root root    6 Jun 11 17:35 html
 
 `sudo nano /etc/httpd/conf/httpd.conf`
 
-`User : polo`
+`User : toto`
 * Redémarrez Apache
 
 `systemctl restart httpd`
@@ -367,6 +368,203 @@ website's domain should reach the appropriate person.
 The most common email address to send to is: "webmaster@example.com"
 ```
 
+📁 Fichier /etc/httpd/conf/httpd.conf
+
 ## II. Une stack web plus avancée
 
 ### 2. Setup
+
+**A. Serveur Web et NextCloud**
+
+
+**🌞 Install du serveur Web et de NextCloud sur web.tp2.linux**
+
+```
+
+11  dnf install epel-release
+12  sudo dnf install epel-release
+15  sudo dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+16  dnf module list php
+18  sudo dnf -y module enable php:remi-7.4
+20  sudo dnf -y install httpd mariadb-server vim wget zip unzip libxml2 openssl php74-php php74-php-ctype php74-php-curl php74-php-gd php74-php-iconv php74-php-json php74-php-libxml php74-php-mbstring php74-php-openssl php74-php-posix php74-php-session php74-php-xml php74-php-zip php74-php-zlib php74-php-pdo php74-php-mysqlnd php74-php-intl php74-php-bcmath php74-php-gmp
+21  systemctl enable httpd
+22  sudo mkdir /etc/httpd/sites-available
+23  sudo mkdir /etc/httpd/sites-enabled
+24  sudo nano /etc/httpd/sites-available/web.tp2.linux
+26  sudo ln -s /etc/httpd/sites-available/web.tp2.linux /etc/httpd/sites-enabled/
+28  sudo mkdir -p /var/www/sub-domains/web.tp2.linux/html
+29  cd /usr/share/zoneinfo
+30  vi /etc/opt/remi/php74/php.ini
+31  sudo vi /etc/opt/remi/php74/php.ini
+33  cd
+34  sudo wget https://download.nextcloud.com/server/releases/nextcloud-21.0.1.zip
+35  sudo vim /etc/httpd/conf/httpd.conf
+36  unzip nextcloud-21.0.1.zip
+37  cd nextcloud/
+38  cp -Rf * /var/www/sub-domains/web.tp2.linux/html/
+39  sudo cp -Rf * /var/www/sub-domains/web.tp2.linux/html/
+40  chown -Rf apache.apache /var/www/sub-domains/web.tp2.linux/html
+41  mv /var/www/sub-domains/web.tp2.linux/html/data /var/www/sub-domains/web.tp2.linux/
+42  sudo mv /var/www/sub-domains/web.tp2.linux/html/data /var/www/sub-domains/web.tp2.linux/
+44  cd
+46  sudo systemctl restart httpd
+47  sudo systemctl restart mariadb
+48  sudo firewall-cmd --add-port=3306/tcp
+49  sudo firewall-cmd --add-port=3306/tcp --permanent
+50  sudo firewall-cmd --reload
+52  sestatus
+53  systemctl status httpd
+54  cd /etc/https
+55  cd /etc/httpd
+56  ls
+57  ls -al sites*
+58  sudo vim conf/httpd.conf
+59  sudo systemctl status httpd
+60  sudo systemctl restart httpd
+61  sudo ls -al /var/log/httpd/
+62  cat sites-enabled/
+63  cat sites-enabled/web.tp2.linux
+64  ls -al /var/www/sub-domains/web.tp2.linux/html/
+65  chown -Rf apache.apache /var/www/sub-domains/web.tp2.linux/html
+68  chown -Rf apache.apache /var/www/sub-domains/web.tp2.linux/html
+69  ls -al chown -Rf apache.apache /var/www/sub-domains/com.yourdomain.nextcloud/html
+70  ls -al /var/www/sub-domains/web.tp2.linux/html
+71  chown -R apache.apache /var/www/sub-domains/web.tp2.linux/html
+72  sudo chown -R apache.apache /var/www/sub-domains/web.tp2.linux/html
+73  ls -al /var/www/sub-domains/web.tp2.linux/html
+74  clear
+75  cd
+76  history
+```
+
+📁 Fichier /etc/httpd/conf/httpd.conf /etc/httpd/sites-available/web.tp2.linux
+
+**B. Base de données**
+
+**🌞 Install de MariaDB sur db.tp2.linux**
+
+
+
+```
+     sudo dnf install mariadb-server
+     sudo systemctl enable mariadb
+     systemctl start mariadb
+     mysql_secure_installation
+```
+
+* Vous repérerez le port utilisé par MariaDB avec une commande ss exécutée sur db.tp2.linux
+
+```
+[paul@db ~]$ sudo ss -alnpt
+[sudo] password for paul:
+State      Recv-Q     Send-Q         Local Address:Port         Peer Address:Port    Process
+[...]
+LISTEN     0          80                         *:3306                    *:*        users:(("mysqld",pid=4700,fd=21))
+```
+
+**🌞 Préparation de la base pour NextCloud**
+
+* Connectez-vous à la base de données à l'aide de la commande sudo mysql -u root
+
+```
+[paul@db ~]$ sudo mysql -u root -p
+[sudo] password for paul:
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 16
+Server version: 10.3.28-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> CREATE USER 'nextcloud'@'10.102.1.11' IDENTIFIED BY 'paul';
+Query OK, 0 rows affected (0.000 sec)
+
+MariaDB [(none)]> CREATE DATABASE IF NOT EXISTS nextcloud CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+Query OK, 1 row affected (0.001 sec)
+
+MariaDB [(none)]> GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'10.102.1.11';
+Query OK, 0 rows affected (0.000 sec)
+
+MariaDB [(none)]> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.000 sec)
+```
+
+**🌞 Exploration de la base de données**
+```
+
+[paul@web ~]$ mysql -u nextcloud -h 10.102.1.12 -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 17
+Server version: 10.3.28-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+```
+
+```
+
+MariaDB [(none)]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| nextcloud          |
++--------------------+
+2 rows in set (0.001 sec)
+
+MariaDB [(none)]> USE nextcloud;
+Database changed
+MariaDB [nextcloud]> SHOW TABLES;
+Empty set (0.001 sec)
+
+```
+
+* Trouver une commande qui permet de lister tous les utilisateurs de la base de données
+
+```
+MariaDB [(none)]> select user,host from mysql.user;
++-----------+-------------+
+| user      | host        |
++-----------+-------------+
+| nextcloud | 10.102.1.11 |
+| root      | 127.0.0.1   |
+| root      | ::1         |
+| root      | localhost   |
++-----------+-------------+
+4 rows in set (0.000 sec)
+```
+
+### C. Finaliser l'installation de NextCloud
+
+**🌞 sur votre PC**
+```
+
+PS C:\WINDOWS\system32> C:\Windows\System32\drivers\etc\hosts
+```
+
+```
+#
+127.0.0.1 localhost
+::1 localhost
+10.102.1.11 web.tp2.linux
+```
+
+**🌞 Exploration de la base de données**
+
+```
+MariaDB [(none)]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| nextcloud          |
+| performance_schema |
++--------------------+
+4 rows in set (0.000 sec)
+```
