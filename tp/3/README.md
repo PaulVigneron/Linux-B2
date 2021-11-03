@@ -52,8 +52,9 @@ sudo: impossible de résoudre l'hôte web.webradio: Nom ou service inconnu
 - vérifier qu'il est configuré pour démarrer automatiquement
 
 ```
-paul@web:~$ sudo systemctl is-enabled nginx
-enabled
+paul@web:~$ sudo systemctl enable nginx
+Synchronizing state of nginx.service with SysV service script with /lib/systemd/systemd-sysv-install.
+Executing: /lib/systemd/systemd-sysv-install enable nginx
 ```
 
 
@@ -122,3 +123,69 @@ Commercial support is available at
 
 
 ![](./image/spongebob-too-easy.gif)
+
+Configuration des blocs de serveur
+
+### **Configuration des blocs du serveur**
+
+`sudo mkdir -p /var/www/web.webradio.linux/html`
+
+`sudo chown -R $USER:$USER /var/www/web.webradio.linux/html`
+
+```
+paul@web:/var/www$ cat /var/www/web.webradio.linux/html/index.html
+<html>
+    <head>
+        <title>Welcome to web.webradio.linux</title>
+    </head>
+    <body>
+        <h1>Success! Your Nginx server is successfully configured for <em>web.webradio.linux</em>. </h1>
+<p>This is a sample page.</p>
+    </body>
+</html>
+```
+
+```
+paul@web:/var/www$ cat /etc/nginx/sites-available/web.webradio.linux
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/web.webradio.linux/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name web.webradio.linux www.web.webradio.linux;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+```
+
+`sudo ln -s /etc/nginx/sites-available/web.webradio.linux /etc/nginx/sites-enabled/`
+
+```
+paul@web:/var/www$ cat /etc/nginx/nginx.conf
+[...]
+        server_names_hash_bucket_size 64;
+[...]
+```
+
+`sudo nginx -t`
+
+`sudo systemctl restart nginx`
+
+```
+paul@web:/var/www$ curl web.webradio.linux
+<html>
+    <head>
+        <title>Welcome to web.webradio.linux</title>
+    </head>
+    <body>
+        <h1>Success! Your Nginx server is successfully configured for <em>web.webradio.linux</em>. </h1>
+<p>This is a sample page.</p>
+    </body>
+</html>
+```
+
+## Installation AzuraCast
+
