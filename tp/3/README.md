@@ -68,3 +68,5 @@ Commercial support is available at
 </body>
 </html>
 ```
+
+![](/image/spongebob-too-easy.gif)
