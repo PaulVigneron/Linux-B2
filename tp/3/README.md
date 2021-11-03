@@ -124,6 +124,8 @@ Commercial support is available at
 
 ![](./image/spongebob-too-easy.gif)
 
+Configuration des blocs de serveur
+
 ### **Configuration des blocs du serveur**
 
 `sudo mkdir -p /var/www/web.webradio.linux/html`
