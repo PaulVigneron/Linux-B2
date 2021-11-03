@@ -69,4 +69,4 @@ Commercial support is available at
 </html>
 ```
 
-![](/image/spongebob-too-easy.gif)
+![](./image/spongebob-too-easy.gif)
