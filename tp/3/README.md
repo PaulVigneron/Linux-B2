@@ -4,9 +4,9 @@
 
 🖥️ **VM web.webradio**
 
-| Machine         | IP            | Service                 | Port ouvert | IP autorisées |
-|-----------------|---------------|-------------------------|-------------|---------------|
-| `web.webradio` | `192.168.56.41` | Serveur Web             | 80        | ?             |
+| Machine         | IP            | Service                 | Port ouvert | 
+|-----------------|---------------|-------------------------|-------------|
+| `web.webradio` | `192.168.56.41` | Serveur Web             | 80        |
 
 ### **Installer le serveur NGINX**
 
