@@ -72,5 +72,5 @@ Une fois l'installation terminée, vous devez visiter l'adresse Web de votre ser
 
 | Machine         | IP            | Service                 | Port ouvert |
 |-----------------|---------------|-------------------------|-------------|
-| `web.tp2.linux` | `10.3.0.45` | Serveur Web             | ?           |
-| `db.tp2.linux`  | `10.3.0.46` | Serveur Base de Données | ?           |
+| `web.azura.linux` | `10.3.0.45` | Serveur Web             | ?           |
+| `db.azura.linux`  | `10.3.0.46` | Serveur Base de Données | ?           |
