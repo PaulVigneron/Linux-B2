@@ -61,3 +61,12 @@ sudo,curl et git d'installer
 ```yes '' | ./docker.sh install```
 
 ![](./image/magique.gif)
+
+Une fois l'installation terminée, vous devez visiter l'adresse Web de votre serveur. Cela peut être l'adresse IP du serveur, un nom de domaine ou localhost si vous exécutez AzuraCast sur votre ordinateur. 
+
+**La configuration Web comprend les étapes suivantes :**
+
+- Création d'un compte administrateur
+- Création de la première station radio que le système gérera
+- Personnalisation des paramètres AzuraCast importants, comme l'URL de base du site et les paramètres HTTPS
+
