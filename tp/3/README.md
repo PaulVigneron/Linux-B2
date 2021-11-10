@@ -70,3 +70,7 @@ Une fois l'installation terminée, vous devez visiter l'adresse Web de votre ser
 - Création de la première station radio que le système gérera
 - Personnalisation des paramètres AzuraCast importants, comme l'URL de base du site et les paramètres HTTPS
 
+| Machine         | IP            | Service                 | Port ouvert |
+|-----------------|---------------|-------------------------|-------------|
+| `web.tp2.linux` | `10.3.0.45` | Serveur Web             | ?           |
+| `db.tp2.linux`  | `10.3.0.46` | Serveur Base de Données | ?           |
