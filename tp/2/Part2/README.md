@@ -224,3 +224,119 @@ sdb           8:16   0    5G  0
 
 **🌞 Rédiger le script de backup /srv/tp2_backup.sh**
 
+
+📁 Fichier /srv/tp2_backup.sh
+
+
+**🌞 Tester le bon fonctionnement**
+
+```
+[paul@backup backup]$ sudo ./tp2_linux.sh /srv/backup/web.tp2.linux/ /home/paul/test/
+[OK] Archive /srv/backup/tp2_backup_211013_190036.tar.gz created.
+[OK] Archive /srv/backup/tp2_backup_211013_190036.tar.gz synchronized to /srv/backup/web.tp2.linux/.
+[OK] Directory /srv/backup/web.tp2.linux/ cleaned to keep only the 5 most recent backups.
+[paul@backup backup]$ cd web.tp2.linux/
+```
+
+```
+[paul@backup web.tp2.linux]$ ls
+tp2_backup_211013_190036.tar.gz
+```
+
+```
+[paul@backup web.tp2.linux]$ sudo tar -xvzf tp2_backup_211013_190036.tar.gz
+[sudo] password for paul:
+home/paul/test/
+home/paul/test/toto.txt
+```
+
+### 4. Unité de service
+
+#### A. Unité de service
+
+
+**🌞 Créer une unité de service pour notre backup**
+
+```
+[paul@backup system]$ cat tp2_backup.service
+[Unit]
+Description=Script Backup et compression
+
+[Service]
+ExecStart=/srv/backup/tp2_backup.sh /srv/backup/web.tp2.linux/ /home/paul/test/
+Type=oneshot
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**🌞 Tester le bon fonctionnement**
+
+```
+[paul@backup system]$ sudo systemctl status tp2_backup.service
+[...]
+Oct 13 19:35:39 backup.tp2.linux tp2_backup.sh[3050]: [OK] Archive //tp2_backup_211013_193539.tar.gz created.
+Oct 13 19:35:39 backup.tp2.linux tp2_backup.sh[3050]: [OK] Archive //tp2_backup_211013_193539.tar.gz synchronized to /srv/backup/web.tp>
+Oct 13 19:35:39 backup.tp2.linux tp2_backup.sh[3050]: [OK] Directory /srv/backup/web.tp2.linux/ cleaned to keep only the 5 most recent >
+Oct 13 19:35:39 backup.tp2.linux systemd[1]: tp2_backup.service: Succeeded.
+Oct 13 19:35:39 backup.tp2.linux systemd[1]: Started Script Backup et compression.
+```
+
+```
+[paul@backup system]$ sudo systemctl daemon-reload
+[paul@backup system]$ sudo systemctl start tp2_backup.service
+```
+
+
+```
+[pauln@backup web.tp2.linux]$ ls
+tp2_backup_211013_190036.tar.gz  tp2_backup_211013_193539.tar.gz
+```
+
+B. Timer
+
+**🌞 Créer le timer associé à notre tp2_backup.service**
+
+
+`sudo touch tp2_backup.timer`
+
+```
+[paul@backup system]$ sudo systemctl start tp2_backup.timer
+[paul@backup system]$ sudo systemctl enable tp2_backup.timer
+Created symlink /etc/systemd/system/timers.target.wants/tp2_backup.timer → /etc/systemd/system/tp2_backup.timer.
+```
+
+```
+[paulbackup system]$ sudo systemctl status tp2_backup.timer
+● tp2_backup.timer - Periodically run our TP2 backup script
+   Loaded: loaded (/etc/systemd/system/tp2_backup.timer; enabled; vendor preset: disabled)
+   Active: active (running) since Wed 2021-10-13 19:45:38 CEST; 1min 2s ago
+  Trigger: n/a
+
+Oct 13 19:45:38 backup.tp2.linux systemd[1]: Started Periodically run our TP2 backup script.
+```
+
+
+**🌞 Tests !**
+
+```
+[paul@backup web.tp2.linux]$ ls
+tp2_backup_211013_193539.tar.gz  tp2_backup_211013_194641.tar.gz  tp2_backup_211013_194843.tar.gz
+tp2_backup_211013_194538.tar.gz  tp2_backup_211013_194743.tar.g
+```
+
+#### C. Contexte
+
+
+**🌞 Faites en sorte que...**
+
+```
+[paul@web system]$ sudo systemctl list-timers
+NEXT                          LEFT     LAST                          PASSED  UNIT                         ACTIVATES
+Fri 2021-10-15 03:15:00 CEST  13h left n/a                           n/a     tp2_backup.timer             tp2_backup.service
+```
+
+
+
+
